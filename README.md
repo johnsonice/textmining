@@ -1,0 +1,2 @@
+# textmining
+text mining notes 
