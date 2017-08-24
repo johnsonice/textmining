@@ -1,6 +1,9 @@
 # Data files 
 *data/
-
+*.p
+*.xml
+*.pdf
+*.PDF
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
