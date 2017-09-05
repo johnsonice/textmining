@@ -8,7 +8,6 @@ Created on Wed Aug 23 09:47:51 2017
 import zipfile 
 import os
 import shutil 
-import csv
 
 #%%
 
@@ -52,35 +51,4 @@ def deep_unzip(folder,remove=True):
         if len(f_zips) > 0:
             unzip(f_zips,remove)
         else: break
-
-#%%
-data_folder = 'data/'
-des_folder = 'xml/'
-sub_folders = ['001','002']
-
-print('unziping all folders under', data_folder)
-deep_unzip(data_folder,remove=True)
-
-for fo in sub_folders:
-    file_folder =os.path.join(data_folder,fo) 
-    f_xmls = get_all_files(file_folder,'.xml')
-    
-    ## move to destination folder 
-    xml_folder = os.path.join(des_folder,fo)
-    _ = check_dir(xml_folder)
-    for f in f_xmls:
-        shutil.move(f,os.path.join(xml_folder,os.path.basename(f)))
-    
-
-## write out xml names, see if they match up with database
-fs = get_all_files(des_folder)
-fns = [os.path.splitext(os.path.basename(f))[0] for f in fs]
-fns = [f for f in fns if not '_' in f] 
-
-with open('filenames.csv','w') as f:
-    writer = csv.writer(f)
-    writer.writerows(zip(fns))
-
-
-
 
