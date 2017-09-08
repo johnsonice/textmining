@@ -33,6 +33,4 @@ if __name__ =='__main__':
         
     pickle.dump(paras,open(out_path, "wb"))
 
-#%%
-
 
