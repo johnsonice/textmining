@@ -46,7 +46,7 @@ def unzip(f_zips,remove=True):
         if remove:
             os.remove(f)
 
-def deep_unzip(folder,remove=True):
+def deep_unzip(folder,remove=True): 
     while True:
         f_zips = get_all_files(folder,'.zip')
         if len(f_zips) > 0:
@@ -56,12 +56,16 @@ def deep_unzip(folder,remove=True):
 #%%
 data_folder = 'data/'
 des_folder = 'xml/'
-sub_folders = ['001','002']
+#sub_folders = ['001','002']
+sub_folders = os.listdir(data_folder) 
+print(sub_folders)
 
+#%%
 print('unziping all folders under', data_folder)
 deep_unzip(data_folder,remove=True)
 
 for fo in sub_folders:
+    print('processing', fo )
     file_folder =os.path.join(data_folder,fo) 
     f_xmls = get_all_files(file_folder,'.xml')
     

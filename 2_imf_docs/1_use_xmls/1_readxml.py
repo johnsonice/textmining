@@ -32,7 +32,6 @@ def clean_fig_table(soup):
 def extract_xml_with_sections(file):
     with open(file,'r') as f:
         soup = BeautifulSoup(f, 'xml')
-        
     soup = clean_fig_table(soup)
         
     document = list()
@@ -148,9 +147,11 @@ def extract_all_folder(file_path,out_path):
 
 #%%
 if __name__ =='__main__':
-    folders = ['001','002']
-    folder_path = 'D:\\usr-profiles\\chuang\\Desktop\\Dev\\textmining\\2_imf_docs\\use_xmls\\XMLs'
-    for f in folders:
-        f_path = os.path.join(folder_path,f)
-        out_path = os.path.join(folder_path,'sentances' + f + '.p')
+    data_folder = 'data/'
+    des_folder = 'xml/'
+    sub_folders = os.listdir(des_folder) 
+    folder_path = os.getcwd()
+    for f in sub_folders:
+        f_path = os.path.join(des_folder,f)
+        out_path = os.path.join(folder_path,'pickle','sentances' + f + '.p')
         extract_all_folder(f_path,out_path)
