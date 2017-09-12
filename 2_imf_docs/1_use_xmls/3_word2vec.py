@@ -14,14 +14,15 @@ import os
 #%%
 data = 'total_results.p'
 total_results = pickle.load(open(data, "rb"))
+#total_results = total_results[:10000]
 #%%
 ### initialize model and build vocabulary 
 n_dim = 300
-window = 7 
+window = 5 
 downsampling = 0.001
 seed = 1 
 num_workers = os.cpu_count()-1    ## not sure if this is a good idea
-min_count = 10 
+min_count = 40 
 imf_w2v = Word2Vec(
     sg=1,
     seed=seed,
@@ -46,4 +47,5 @@ else:
 ## save trained word2 to vect model 
 if not os.path.exists("trained"):
     os.makedirs("trained")
-    imf_w2v.save(os.path.join('trained','imf.w2v'))
+
+imf_w2v.save(os.path.join('trained','imf.w2v'))

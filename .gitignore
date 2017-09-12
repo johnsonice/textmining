@@ -1,9 +1,11 @@
 # Data files 
 *data/
+*trained/
 *.p
 *.xml
 *.pdf
 *.PDF
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
