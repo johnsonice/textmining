@@ -14,15 +14,15 @@ import os
 #%%
 data = 'total_results.p'
 total_results = pickle.load(open(data, "rb"))
-#total_results = total_results[:10000]
+
 #%%
 ### initialize model and build vocabulary 
 n_dim = 300
 window = 5 
 downsampling = 0.001
 seed = 1 
-num_workers = os.cpu_count()-1    ## not sure if this is a good idea
-min_count = 40 
+num_workers = os.cpu_count()-5    ## not sure if this is a good idea
+min_count = 30 
 imf_w2v = Word2Vec(
     sg=1,
     seed=seed,
@@ -38,7 +38,7 @@ imf_w2v.build_vocab(total_results)
 #%%
 ## train w2v model 
 corpus_count = imf_w2v.corpus_count
-iteration = 20
+iteration = 1000
 if gensim.__version__[0] =='1':
     imf_w2v.train(total_results)
 else:

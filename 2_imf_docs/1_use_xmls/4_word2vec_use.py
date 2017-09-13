@@ -15,4 +15,4 @@ imf_w2v = Word2Vec.load(data_path)
 model = imf_w2v.wv
 vocabs = model.vocab.keys()
 
-
+#%%
