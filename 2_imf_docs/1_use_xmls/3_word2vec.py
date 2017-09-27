@@ -10,6 +10,8 @@ import gensim
 from gensim.models.word2vec import Word2Vec
 import pickle
 import os
+import time
+import datetime
 
 #%%
 data = 'total_results.p'
@@ -21,7 +23,7 @@ n_dim = 300
 window = 5 
 downsampling = 0.001
 seed = 1 
-num_workers = os.cpu_count()-5    ## not sure if this is a good idea
+num_workers = os.cpu_count()-2    ## not sure if this is a good idea
 min_count = 30 
 imf_w2v = Word2Vec(
     sg=1,
@@ -38,14 +40,21 @@ imf_w2v.build_vocab(total_results)
 #%%
 ## train w2v model 
 corpus_count = imf_w2v.corpus_count
-iteration = 1000
-if gensim.__version__[0] =='1':
-    imf_w2v.train(total_results)
-else:
-    imf_w2v.train(total_results,total_examples=corpus_count,epochs = iteration)
-
-## save trained word2 to vect model 
-if not os.path.exists("trained"):
-    os.makedirs("trained")
-
-imf_w2v.save(os.path.join('trained','imf.w2v'))
+overall_start_time = time.time()
+for i in range(200):
+    start_time = time.time()
+    iteration = 10
+    print('running',i+1,'-',(i+1)*iteration)
+    if gensim.__version__[0] =='1':
+        imf_w2v.train(total_results)
+    else:
+        imf_w2v.train(total_results,total_examples=corpus_count,epochs = iteration)
+    
+    ## save trained word2 to vect model 
+    if not os.path.exists("trained"):
+        os.makedirs("trained")
+    file_path = os.path.join('trained','imf_'+str(i)+'.w2v')
+    imf_w2v.save(file_path)
+    time_used = str(datetime.timedelta(seconds=time.time() - start_time))
+    print('finished {} iterations, timeused {}'.format((i+1)*iteration,time_used))
+    

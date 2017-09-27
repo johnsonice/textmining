@@ -105,11 +105,11 @@ if __name__ =='__main__':
     ### bigram and trigram##
     ########################
     print('Transform sentances to trigrams .........\n')
-    bi_phrases = Phrases(sentances, min_count=5, threshold=30)
+    bi_phrases = Phrases(sentances, min_count=5, threshold=20)
     bigram_transformer = Phraser(bi_phrases)
     sentances = list(bigram_transformer[sentances]) 
 
-    tri_phrases = Phrases(sentances, min_count=5, threshold=20)
+    tri_phrases = Phrases(sentances, min_count=5, threshold=10)
     trigram_transformer = Phraser(tri_phrases)
     sentances = list(trigram_transformer[sentances])
     

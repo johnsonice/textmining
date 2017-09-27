@@ -8,6 +8,7 @@ Created on Wed Aug 23 09:47:51 2017
 import zipfile 
 import os
 import shutil 
+import re
 
 #%%
 
@@ -52,3 +53,9 @@ def deep_unzip(folder,remove=True):
             unzip(f_zips,remove)
         else: break
 
+def find_exact_keywords(content,keyWords):
+    content = content.replace('\n', '').replace('\r', '').replace('.',' .')
+    r_keyWords = [r'\b' + re.escape(k) + r'\b'for k in keyWords]             # tronsform keyWords list to a patten list
+    rex = re.compile('|'.join(r_keyWords),flags=re.I)                        # use or to join all of them, ignore casing
+    match = [(m.start(),m.group()) for m in rex.finditer(content)]
+    return match

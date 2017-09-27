@@ -56,6 +56,7 @@ def deep_unzip(folder,remove=True):
 #%%
 data_folder = 'data/'
 des_folder = 'xml/'
+output_folder = 'outputs/'
 #sub_folders = ['001','002']
 sub_folders = os.listdir(data_folder) 
 print(sub_folders)
@@ -81,7 +82,7 @@ fs = get_all_files(des_folder)
 fns = [os.path.splitext(os.path.basename(f))[0] for f in fs]
 fns = [f for f in fns if not '_' in f] 
 
-with open('filenames.csv','w') as f:
+with open(os.path.join(output_folder,'filenames.csv'),'w') as f:
     writer = csv.writer(f)
     writer.writerows(zip(fns))
 
