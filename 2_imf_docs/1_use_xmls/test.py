@@ -6,6 +6,13 @@ import csv
 
 
 #%%     
+test= " aan awn (asd 3) 1/ i  am not a ." 
+text = re.sub(r'\(.*?\d+.*?\)|\s\s+|\d/',' ',test)
+print(text)
+
+
+
+#%%
 class rep(object):
     def __init__(self,rep_dict):
         self.rep_dict = dict((re.escape(k), v) for k, v in rep_dict.items())

@@ -5,6 +5,8 @@
 *.xml
 *.pdf
 *.PDF
+*.csv
+*.txt
 
 
 # Byte-compiled / optimized / DLL files
