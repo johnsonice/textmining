@@ -10,11 +10,11 @@ import os
 os.chdir('d:/usr-profiles/chuang/Desktop/Dev/textmining/2_imf_docs/1_use_xmls/process_search_docs')
 import pandas as pd
 #import csv 
-from util import read_keywords
+from util import read_keywords,find_exact_keywords,construct_rex
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize,sent_tokenize
 from nltk.stem import WordNetLemmatizer
-#import copy
+import copy
 
 #%%
 
@@ -71,7 +71,15 @@ def get_negation_check(tokens,idx,ran=3):
     negation_check = tokens[nidx[0]:nidx[1]] 
     return negation_check
     
-def get_pos_count(text,pos_list,neg_list,negations,stopw,lemmatizer):
+def get_pos_count(text,pos_list,neg_list,negations,stopw,lemmatizer,search_keys,search_rex,by='sent'):
+    
+    if by == 'sent':
+        sentences = sent_tokenize(text)
+        s_list = [s for s in sentences if len(find_exact_keywords(s,search_keys,rex))>0]
+        reduced_para = ' '.join(s_list)
+        if len(reduced_para)==0: return 0,0,0,''
+        text = reduced_para
+
     tokens = _process_text(text,stopw,lemmatizer)
     total_words = len(tokens)
     pos = 0 
@@ -90,13 +98,13 @@ def get_pos_count(text,pos_list,neg_list,negations,stopw,lemmatizer):
                 pos+=1 
             else:
                 neg+=1 
-    
-    return pos,neg,total_words
+            
+    return pos,neg,total_words,text
     
 #%%
 xml_results = 'data/xml_results.csv'
 txt_results = 'data/txt_results.csv'
-sentiment_path = 'sentiment_words.csv'
+sentiment_path = 'sentiment_words_modified.csv'
 negations = ['not','no','nobody','nobody','none','never','neither','cannot',"can't"]
 stopw = stopwords.words('english')
 stopw = [s for s in stopw if s not in negations]
@@ -104,12 +112,19 @@ lemmatizer = WordNetLemmatizer()
 
 df = combine_df(xml_results,txt_results)
 pos_list, neg_list = get_sent_keys(sentiment_path)
+search_keys = copy.deepcopy(df.columns.values.tolist())[4:]
+rex = construct_rex(search_keys)
+
 #%%
-df['sentiment'] = df['context'].apply(get_pos_count,args=(pos_list,neg_list,negations,stopw,lemmatizer))
-df[['sentiment_pos','sentiment_neg','total_words_no_stop']] = df['sentiment'].apply(pd.Series) 
+# test
+#test = df['context'][:10].apply(get_pos_count,args=(pos_list,neg_list,negations,stopw,lemmatizer,search_keys,rex))
+
+#%%
+df['sentiment'] = df['context'].apply(get_pos_count,args=(pos_list,neg_list,negations,stopw,lemmatizer,search_keys,rex))
+df[['sentiment_pos','sentiment_neg','total_words_no_stop','reduced_context']] = df['sentiment'].apply(pd.Series) 
 #%%
 df_headers = df.columns.values.tolist()
-meta_list = ['doc_id','para_id','context','para_word_count','sentiment_pos','sentiment_neg','total_words_no_stop']
+meta_list = ['doc_id','para_id','context','reduced_context','para_word_count','sentiment_pos','sentiment_neg','total_words_no_stop']
 var_list = [v for v in df_headers if v not in meta_list ]
 var_list.remove('sentiment')
 ordered_var_list = meta_list + var_list
