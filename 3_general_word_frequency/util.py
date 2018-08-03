@@ -42,7 +42,7 @@ class document(object):
     
     def extract_xml_paras(self):
         with open(self.xml_path,'r',encoding='utf8') as f:
-            soup = BeautifulSoup(f, 'xml')
+            soup = BeautifulSoup(f, 'lxml')
         try:
             soup = self.clean_fig_table(soup)
             p_list = soup.body.find_all('p')
@@ -140,11 +140,12 @@ def read_meta(file):
     file: csv file with meta data for file ids 
     return: a list of ids, a matrix of all metadatafile 
     """
-    with open(file,'r') as f:
+    with open(file,'r',encoding='utf-8',errors='ignore') as f:
         reader = csv.reader(f)
         meta = list(reader)
         ids = [row[3] for row in meta ][1:]
     return ids,meta
+
 
 def read_ids(file):
     """
