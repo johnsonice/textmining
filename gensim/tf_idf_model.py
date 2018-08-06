@@ -42,7 +42,7 @@ def bow_extractor(corpus,ngram_range=(1,1)):
 ## comput document frequency 
 def build_df(bow_features):
     df = np.diff(sp.csc_matrix(bow_features,copy=True).indptr)
-    df += 1  ## to smoothen idf latter to avoid 0s 
+    #df += 1  ## to smoothen idf latter to avoid 0s 
     return df 
 
 def build_df_dum(bow_features,vocabs=None):
@@ -57,9 +57,9 @@ def build_df_dum(bow_features,vocabs=None):
 ## compute inverse document frequency 
 
 def build_idf(corpus,df):
-    total_docs = 1+len(corpus)
+    total_docs = len(corpus)
     #idf = 1 + np.log(total_docs/df)   ## be very careful with this formula, especially when your sample is small
-    idf = np.log(total_docs/df)     
+    idf = np.log2(total_docs/df)     
     return idf 
 
 ## compute idf diagonal matrix 
