@@ -56,10 +56,10 @@ def build_df_dum(bow_features,vocabs=None):
 
 ## compute inverse document frequency 
 
-def build_idf(corpus,df):
+def build_idf(corpus,df,smooth=0.0):
     total_docs = 1+len(corpus)
-    #idf = 1 + np.log(total_docs/df)   ## be very careful with this formula, especially when your sample is small
-    idf = np.log(total_docs/df)     
+    idf = smooth + np.log(total_docs/df)   ## be very careful with this formula, especially when your sample is small
+    #idf = np.log(total_docs/df)     
     return idf 
 
 ## compute idf diagonal matrix 
@@ -69,12 +69,12 @@ def build_idf_diag_matrix(idf):
     idf_diag = idf_diag.todense()
     return idf_diag
 
-def calculate_tfidf(corpus,norm=False):
+def calculate_tfidf(corpus,norm=False,smooth=0.0):
     bow_transformer,features = bow_extractor(corpus)
     shape = features.shape
     tf = features.todense()
     df = build_df(features)
-    idf = build_idf(corpus,df)
+    idf = build_idf(corpus,df,smooth=smooth)
     idf_matrix = np.repeat(idf,shape[0],axis=0).reshape(shape[1],shape[0]).T
     tfidf = np.multiply(tf,idf_matrix)
     

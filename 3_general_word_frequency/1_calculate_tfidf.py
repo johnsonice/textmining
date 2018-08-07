@@ -32,7 +32,7 @@ for i in range(shape[0]):
     tf_i = copy.deepcopy(tf)
     tf_i = np.delete(tf_i,i,axis=0)
     df = build_df(tf_i)
-    idf = build_idf(docs,df)
+    idf = build_idf(docs,df,smooth=0.1)
     idf_list.append(idf)
     
 idf_mat = np.stack(idf_list,axis=0)  ## stack all idf into matrix
@@ -42,9 +42,7 @@ tf_idf_norm = tf_idf/norms[:,None]            ## normalized
 
 #%%
 #normal tfidf
-
-sd_tfidf = calculate_tfidf(docs)
-
+sd_tfidf = calculate_tfidf(docs,smooth=0.1)
 
 #%%
 # export 

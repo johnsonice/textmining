@@ -26,7 +26,10 @@ def dummy_func(doc):
 class rep(object):
     def __init__(self,rep_dict):
         self.rep_dict = dict((re.escape(k), v) for k, v in rep_dict.items())
-        self.pattern = re.compile("|".join(rep_dict.keys()))
+        ## if you want to match any occurance
+        ## self.pattern = re.compile("|".join(rep_dict.keys()))
+        ## if you want to match whole words only
+        self.pattern = re.compile(r'\b(' + '|'.join(rep_dict.keys()) + r')\b')
     
     def replace(self,text):
         result = self.pattern.sub(lambda m: self.rep_dict[re.escape(m.group(0))], text)
@@ -54,6 +57,15 @@ def process_keys(file,outfile):
         wr = csv.writer(resultFile, lineterminator='\n')
         [wr.writerow([k]) for k in key_list]
     print('output updated keyword list: success')
+
+def read_word_groupings(file):
+    with open(file,'r',encoding='utf-8',) as f:
+        reader = csv.reader(f)
+        mylist = list(reader)
+        
+    words_pair = [(s[0].replace('\ufeff','').strip(),s[1]) for s in mylist]
+    replace_dict = {k:v for k,v in words_pair}
+    return replace_dict
 
 def read_pattern(file):
     """
@@ -140,43 +152,16 @@ trigram_transformer = Phraser.load(os.path.join('data','trigram_transformer'))
 docs = [phrase_detect(bigram_transformer,trigram_transformer,d) for d in docs]
 
 #%%
+## group similar words inot one concept
+gruping_file = 'input/word_groupings.csv'
+replace_dict = read_word_groupings(gruping_file)
+pattern = rep(replace_dict)
+docs = [' '.join(d) for d in docs]
+docs = [pattern.replace(d) for d in docs]
+docs = [d.split() for d in docs]
+
+#%%
 ##export to pickle
 pickle.dump((file_names,docs), open( "data/processed_docs.p", "wb" ) )
 ##%%
-#bow_transformer = CountVectorizer(
-#                        analyzer='word',   ## this can actually be any kind of function to preprocess your text
-#                        tokenizer=dummy_func,
-#                        preprocessor=dummy_func,
-#                        token_pattern=None)  
-#
-#docs_bow = bow_transformer.fit_transform(docs)
-#print('Shape of Sparse Matrix: ',docs_bow.shape)
-##%%
-#vocabs = bow_transformer.get_feature_names()
-##%%
-#tf = pd.DataFrame(docs_bow.toarray(),columns=vocabs)
-#
-##%%
-#N = len(tf)
-#df = copy.deepcopy(tf)
-#df[df != 0] = 1
-#df = df.agg('sum')          ## calculate document frequency 
-#df.replace(0,1,inplace=True)
-#idf = df.apply(lambda x:log(N/x))
-##%%
-### tfidf 
-#tf_idf = tf*idf
-##%%
-#tf = tf.T
-#tf.columns = file_names
-#tf_idf = tf_idf.T
-#tf_idf.columns = file_names
-#tf.to_csv('tf_results.csv')
-#tf_idf.to_csv('tfidf_results.csv')
-##%%
-##doc_tf = tf.loc[100].sort_values(ascending=False)
-##doc_tf.name = 'tf'
-##doc_tf_idf = tf_idf.loc[100].sort_values(ascending=False)
-##doc_tf_idf.name = 'tf_idf'
-##doc_df = pd.concat([doc_tf,doc_tf_idf],axis=1)
 
