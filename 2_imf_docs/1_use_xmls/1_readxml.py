@@ -31,7 +31,7 @@ def clean_fig_table(soup):
 #%%
 def extract_xml_with_sections(file):
     with open(file,'r') as f:
-        soup = BeautifulSoup(f, 'xml')
+        soup = BeautifulSoup(f, 'lxml')
     soup = clean_fig_table(soup)
         
     document = list()
