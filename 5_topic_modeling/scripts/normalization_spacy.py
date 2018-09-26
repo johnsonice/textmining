@@ -30,13 +30,13 @@ def expand_contractions(text, contraction_mapping):
     return expanded_text
 
 
-def phrase_detect_train(sentances,min_count,threshold,phrase_model_save_path = None):
+def phrase_detect_train(sentances,min_count,threshold,common_terms,phrase_model_save_path = None):
     """
     input:
         sentances: tokenized sentances 
     """
     print('Transform sentances to trigrams .........\n')
-    bi_phrases = Phrases(sentances, min_count=min_count, threshold=threshold)
+    bi_phrases = Phrases(sentances, min_count=min_count, threshold=threshold,common_terms=common_terms)
     bigram_transformer = Phraser(bi_phrases)
     if phrase_model_save_path is not None:
         bi_phrases.save(phrase_model_save_path)
@@ -63,7 +63,13 @@ def phrase_detect(bigram_transformer,trigram_transformer,text_tokens):
     tri_text_tokens = trigram_transformer[bi_text_tokens]
     return tri_text_tokens
 
-
+def _flatten(container):
+    for i in container:
+        if isinstance(i, (list,tuple)):
+            for j in _flatten(i):
+                yield j
+        else:
+            yield i
 #%%
 if __name__ == "__main__":
     nlp = en_core_web_md.load()
