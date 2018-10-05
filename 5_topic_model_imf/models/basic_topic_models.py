@@ -207,17 +207,19 @@ def fine_tune_lda(corpus, dictionary, texts, limit, start=2, step=2):
 if __name__== "__main__":
     
     save = True  ## save gensim objects, corpus, dictionary, and lda model
-    mode = 'lda'
+    mode = 'all'
     docs,dictionary,corpus_bow,corpus_tfidf = prepare_data(save=save)
+    corpus_bow = [c for c in corpus_bow if len(c)>0]
     
     if mode == 'lda' or mode=='all':
         n_topics = 25
-        model, score = basic_lda(total_topics=n_topics,corpus=corpus_bow[:10000],dictionary=dictionary,docs=docs[:10000],score=True)
+        model, score = basic_lda(total_topics=n_topics,corpus=corpus_bow,dictionary=dictionary,docs=docs,score=True)
+        print(score)
         print_topics_gensim(topic_model=model,
                            total_topics = n_topics,
                            num_terms=20,
                            display_weights=True)
-    elif mode =='seed_lda' or mode=='all':
+    if mode =='seed_lda' or mode=='all':
         n_topics = 25
         boost = 1000
         seed_topic_list = [['mpm','MPM','CFM','cfm','ltv','LTC','DSTI','dsti','lcr','LCR',
@@ -232,7 +234,7 @@ if __name__== "__main__":
                            num_terms=20,
                            display_weights=True)
     
-    elif mode == 'fine_tune' or mode =='all':
+    if mode == 'fine_tune' or mode =='all':
         
         model_list, coherence_values,n_topics = fine_tune_lda(dictionary=dictionary, corpus=corpus_bow,
                                                             texts=docs, start=15, limit=35, step=1)
@@ -250,9 +252,7 @@ if __name__== "__main__":
         if save:
             lda_model_filepath = '../data/lda_res'
             best_model.save(lda_model_filepath)
-    else:
-        print('Invalide mode: {}'.format(mode))
-        pass
+
     
     
     

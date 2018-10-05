@@ -123,27 +123,27 @@ def seeded_lda(total_topics,corpus,dictionary,docs,seed_topic_list, boost, score
     
     return seed_model
 #%%
-
-save = False  ## save gensim objects, corpus, dictionary, and lda model
-docs,dictionary,corpus_bow,corpus_tfidf = prepare_data(save=save)
-
-
-#%%
-n_topics = 25
-boost = 1000
-seed_topic_list = [['mpm','MPM','CFM','cfm','ltv','LTC','DSTI','dsti','lcr','LCR',
-                    'capital_buffer','macroprudential','capital_flow','prudential'],
-                    ['population','ageing','pension','productivity','migration','migrat']]
+if __name__=="__main__":
+    save = False  ## save gensim objects, corpus, dictionary, and lda model
+    docs,dictionary,corpus_bow,corpus_tfidf = prepare_data(save=save)
+    corpus_bow = [c for c in corpus_bow if len(c)>0]
+    #%%
+    n_topics = 25
+    boost = 1000
+    seed_topic_list = [['mpm','MPM','CFM','cfm','ltv','LTC','DSTI','dsti','lcr','LCR',
+                        'capital_buffer','macroprudential','capital_flow','prudential'],
+                        ['population','ageing','pension','productivity','migration','migrat']]
+        
+    seed_model = seeded_lda(n_topics,corpus_bow,dictionary,docs,seed_topic_list, boost, score=False)
     
-seed_model = seeded_lda(n_topics,corpus_bow,dictionary,docs,seed_topic_list, boost, score=False)
-
-#%%
-
-coherence_model_lda = CoherenceModel(model=seed_model, texts=docs[:100], dictionary=dictionary, coherence='c_v')
-coherence_lda = coherence_model_lda.get_coherence()
-#%%
-
-print_topics_gensim(topic_model=seed_model,
-                   total_topics = n_topics,
-                   num_terms=20,
-                   display_weights=True)
+    #%%
+    
+    coherence_model_lda = CoherenceModel(model=seed_model, texts=docs, dictionary=dictionary, coherence='c_v')
+    coherence_lda = coherence_model_lda.get_coherence()
+    print(coherence_lda)
+    #%%
+    
+    #print_topics_gensim(topic_model=seed_model,
+    #                   total_topics = n_topics,
+    #                   num_terms=20,
+    #                   display_weights=True)
