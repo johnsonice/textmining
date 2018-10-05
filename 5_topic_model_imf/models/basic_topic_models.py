@@ -12,42 +12,36 @@ import sys
 import os
 import gensim
 import pickle
-from collections import Counter
-import pyLDAvis
-import pyLDAvis.gensim  # don't skip this
-import matplotlib
+#from collections import Counter
+#import pyLDAvis
+#import pyLDAvis.gensim  # don't skip this
+#import matplotlib
 import matplotlib.pyplot as plt
 
 python_root = './scripts'
 sys.path.insert(0, python_root)
 
 #%%
+def prepare_data(save=True):
+    ## read and transform data 
+    contents = pickle.load(open('../data/lemma_corpus.p', "rb"))
+    docs = list()
+    for paragraph in contents:
+        docs.append([w for sentance in paragraph for w in sentance])
+    
+    #%%
+    # build dictionary
+    if save:
+        dictionary = corpora.Dictionary(docs)
+        dictionary.filter_extremes(no_below=5,no_above=0.5, keep_n=10000)
+        # convert document into bow
+        corpus_bow = [dictionary.doc2bow(text) for text in docs]
+        ## comput tfidf feature vectors
+        tfidf = models.TfidfModel(corpus_bow) # smartirs = 'atc' https://radimrehurek.com/gensim/models/tfidfmodel.html
+        corpus_tfidf = tfidf[corpus_bow]
+    
+    return docs,dictionary,corpus_bow,corpus_tfidf
 
-## read and transform data 
-contents = pickle.load(open('../data/lemma_corpus.p', "rb"))
-docs = list()
-for paragraph in contents:
-    docs.append([w for sentance in paragraph for w in sentance])
-
-#%%
-# build dictionary
-
-dictionary = corpora.Dictionary(docs)
-dictionary.filter_extremes(no_below=5,no_above=0.5, keep_n=10000)
-# convert document into bow
-corpus_bow = [dictionary.doc2bow(text) for text in docs]
-## comput tfidf feature vectors
-tfidf = models.TfidfModel(corpus_bow) # smartirs = 'atc' https://radimrehurek.com/gensim/models/tfidfmodel.html
-corpus_tfidf = tfidf[corpus_bow]
-
-#%%
-## save dictionary and corpora 
-#dictionary_save_path = '../data/dictionary.dict'
-#dictionary.compactify()
-#dictionary.save(dictionary_save_path)
-#corpora.MmCorpus.serialize('../data/corpus_bow.mm', corpus_bow)
-#corpora.MmCorpus.serialize('../data/corpus_tfidf.mm', corpus_tfidf)
-#print(len(dictionary))
 #%%
 
 ## a better way to print 
@@ -171,28 +165,34 @@ def fine_tune_lda(corpus, dictionary, texts, limit, start=2, step=2):
 
     return model_list, coherence_values,n_topics
 
-
 #%%
 if __name__== "__main__":
-       
-    #model, score = lsi(total_topics=15,corpus=corpus_bow[:1000],dictionary=dictionary,docs=docs[:1000],score=True)
-    #print(score)
-    #model_path = '../data/mallet-2.0.8/mallet-2.0.8/bin/mallet'
-    #lda= gensim.models.wrappers.LdaMallet(model_path, corpus=corpus_bow[:1000], num_topics=20, id2word=dictionary)
     
+    save = True  ## save gensim objects, corpus, dictionary, and lda model
+    
+    docs,dictionary,corpus_bow,corpus_tfidf = prepare_data(save=save)
     
     #model, score = basic_lda(total_topics=15,corpus=corpus_bow[:10000],dictionary=dictionary,docs=docs[:10000],score=True)
     
     model_list, coherence_values,n_topics = fine_tune_lda(dictionary=dictionary, corpus=corpus_bow,
-                                                        texts=docs, start=10, limit=30, step=1)
+                                                        texts=docs, start=15, limit=35, step=1)
     
     best_model = model_list[np.argmax(coherence_values)]
-    n_topics = best_model.get_topics().shape[0]
+    best_topic_n = best_model.get_topics().shape[0]
     
     plt.plot(n_topics, coherence_values)
     plt.show()
     
     print_topics_gensim(topic_model=best_model,
-                   total_topics = n_topics,
+                   total_topics = best_topic_n,
                    num_terms=10,
                    display_weights=True)
+    if save:
+        lda_model_filepath = '../data/lda_res'
+        best_model.save(lda_model_filepath)
+    
+    
+    
+    
+    
+    
