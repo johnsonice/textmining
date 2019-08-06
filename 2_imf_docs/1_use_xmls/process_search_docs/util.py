@@ -42,7 +42,7 @@ class document(object):
     
     def extract_xml_paras(self):
         with open(self.xml_path,'r',encoding='utf8') as f:
-            soup = BeautifulSoup(f, 'xml')
+            soup = BeautifulSoup(f, 'lxml')
         try:
             soup = self.clean_fig_table(soup)
             p_list = soup.body.find_all('p')
